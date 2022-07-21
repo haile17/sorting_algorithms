@@ -1,50 +1,92 @@
 #include "sort.h"
 /**
- * insertion_sort_list - sorts a doubly linked list of integers
- * in ascending order using the Insertion sort ailgorithm
- * @list: pointer to the list head
- * Return: no return
+ * swap_backward -swap two nodes right left position
+ * @c: list
+ *
+ **/
+void swap_backward(listint_t *c)
+{
+	listint_t *tmp, *head;
+
+	while (c->prev != NULL)
+	{
+		if (c->n < c->prev->n)
+		{
+			tmp = c->prev->prev;
+			c->prev->next = c->next;
+			c->next = c->prev;
+			c->prev->prev = c;
+			c->prev = tmp;
+			c->next->next->prev = c->next;
+			if (tmp != NULL)
+				tmp->next = c;
+			head = c;
+			while (head->prev != NULL)
+				head = head->prev;
+			print_list(head);
+		}
+		else
+			c = c->prev;
+	}
+}
+/**
+ * swap_forward -swap two nodes left rigth position
+ * @c: list
+ *
+ **/
+void swap_forward(listint_t *c)
+{
+	listint_t *tmp, *head;
+
+	tmp = c->prev;
+
+	if (tmp != NULL)
+	{
+		tmp->next = c->next;
+		c->next->prev = tmp;
+	}
+	else
+		c->next->prev = NULL;
+	c->prev = c->next;
+	if (c->next->next != NULL)
+	{
+		c->next = c->next->next;
+		c->prev->next = c;
+		c->next->prev = c;
+	}
+	else
+	{
+		c->next->next = c;
+		c->next = NULL;
+	}
+	head = c;
+	while (head->prev != NULL)
+		head = head->prev;
+	print_list(head);
+	swap_backward(c->prev);
+}
+/**
+ * insertion_sort_list -sort a doubly linked list with insert algorithm
+ * @list: list
+ *
  **/
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *head_tmp1, *head_tmp2, *aux1, *aux2;
-	int flag;
+	listint_t *c;
 
-	if (list)
+	if ((list == NULL) || (*list == NULL) || ((*list)->next == NULL))
+		return;
+	c = *list;
+
+	while (c->next != NULL)
 	{
-		head_tmp1 = *list;
-		head_tmp2 = *list;
-		while (list && head_tmp1->next)
+		if (c->n > c->next->n)
 		{
-			if (head_tmp1->next)
-			{
-				flag = 0;
-				head_tmp2 = head_tmp1;
-				while (head_tmp2 && head_tmp2->n > head_tmp2->next->n)
-				{
-					aux1 = head_tmp2;
-					aux2 = head_tmp2->next;
-					aux1->next = aux2->next;
-					if (aux2->next)
-						aux2->next->prev = aux1;
-					if (aux2)
-					{
-						aux2->prev = aux1->prev;
-						aux2->next = aux1;
-					}
-					if (aux1)
-						aux1->prev = aux2;
-					if (aux2->prev)
-						aux2->prev->next = aux2;
-					head_tmp2 = aux2->prev;
-					if (!aux2->prev)
-						*list = aux2;
-					print_list(*list);
-					flag = 1;
-				}
-			}
-			if (flag == 0)
-				head_tmp1 = head_tmp1->next;
+			swap_forward(c);
 		}
+		else
+			c = c->next;
 	}
+	while ((*list)->prev != NULL)
+		*list = (*list)->prev;
 }
